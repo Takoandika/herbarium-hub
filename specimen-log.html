@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specimen Display · BYU-H Herbarium Hub</title>
+<style>
+  :root{--ink:#173b36;--deep:#123b34;--muted:#74847a;--line:#dfe7dd;--paper:#f7f6ef;--card:#fffefa;--leaf:#66836b;--pale:#edf2e9;--gold:#c8a365;--shadow:0 22px 60px #24433414}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .site-header{height:76px;padding:0 clamp(20px,6vw,90px);display:flex;align-items:center;justify-content:space-between;background:#fffefa;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:13px}.logo{width:44px;height:44px;border:1px dashed #9aac9b;border-radius:12px;background:#eff3eb;display:grid;place-items:center;color:#607c65}.logo svg{width:25px;height:25px;stroke:currentColor}
+  .brand-name{font-size:12px;font-weight:750;letter-spacing:.07em;color:#294e40;text-transform:uppercase}.brand-caption{display:block;margin-top:2px;font-size:10px;letter-spacing:.11em;color:#87958a;text-transform:uppercase}
+  .header-note{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#89958c}
+  main{max-width:1320px;margin:0 auto;padding:clamp(32px,5vw,66px) clamp(20px,5vw,68px) 70px}
+  .page-title{text-align:center;margin-bottom:38px}.overline{margin:0 0 9px;color:#78907c;font-size:10px;letter-spacing:.24em;text-transform:uppercase;font-weight:750}
+  h1{margin:0;color:var(--deep);font:500 clamp(31px,4.5vw,49px)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.035em}.title-rule{width:45px;height:2px;background:var(--gold);margin:18px auto 0}
+  .specimen-card{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(350px,.92fr);background:var(--card);border:1px solid #e6e8de;border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+  .gallery{padding:26px;background:#edf0e7;display:flex;flex-direction:column;gap:13px;min-width:0}
+  .main-photo{height:clamp(350px,47vw,610px);position:relative;display:grid;place-items:center;overflow:hidden;background:#e5e9dc;border-radius:12px;cursor:zoom-in}
+  .main-photo img{width:100%;height:100%;display:block;object-fit:cover;transition:opacity .2s}.photo-art{width:100%;height:100%;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 43%,#f5f4e9 0%,#e8ecdf 58%,#dce4d7 100%)}
+  .photo-art svg{width:min(72%,440px);height:min(85%,520px);filter:drop-shadow(0 15px 16px #263f291a)}
+  .image-caption{position:absolute;left:14px;bottom:13px;padding:6px 10px;background:#fffefaeb;border:1px solid #ffffffa6;border-radius:30px;color:#53685a;font-size:10px;letter-spacing:.04em}
+  .thumb-row{display:flex;gap:10px;overflow-x:auto;padding:1px 1px 4px}.thumb{width:78px;height:78px;flex:0 0 78px;border:2px solid transparent;padding:0;border-radius:9px;overflow:hidden;background:#dfe6da;cursor:pointer;opacity:.78;transition:opacity .15s,border-color .15s}.thumb:hover{opacity:1}.thumb.active{border-color:#66836b;opacity:1}.thumb img{width:100%;height:100%;object-fit:cover;display:block}.thumb-art{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg,#f3f2e8,#dfe8d9);color:#729073}.thumb-art svg{width:35px;height:42px}
+  .details{padding:clamp(28px,4.2vw,58px);display:flex;flex-direction:column;justify-content:center}.record-kicker{margin:0 0 13px;color:#7b927f;text-transform:uppercase;letter-spacing:.18em;font-size:10px;font-weight:750}
+  h2{margin:0;color:var(--deep);font:italic 500 clamp(29px,3.5vw,42px)/1.12 Georgia,"Times New Roman",serif;letter-spacing:-.025em}.common-name{margin:10px 0 20px;color:#718178;font:italic 17px Georgia,"Times New Roman",serif}
+  .family-pill{align-self:flex-start;border:1px solid #dce5db;border-radius:30px;padding:6px 11px;color:#55705e;background:#f6f8f2;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .detail-divider{height:1px;background:var(--line);margin:23px 0 7px}
+  .facts{margin:0}.fact{display:grid;grid-template-columns:minmax(125px,.72fr) minmax(0,1.4fr);gap:16px;padding:11px 0;border-bottom:1px solid #edf0e9}.fact:last-child{border-bottom:0}.fact dt{color:#859188;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:750}.fact dd{margin:0;color:#355347;font-size:13px;overflow-wrap:anywhere}.fact.long dd{line-height:1.55}
+  .specimen-number{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 15px;margin-top:23px;border:1px solid #e1e8de;border-radius:10px;background:#f7f8f2}.specimen-number span{color:#87948a;font-size:9px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}.specimen-number strong{color:#375a46;font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}
+  .bottom-note{text-align:center;color:#8e988e;font-size:10px;letter-spacing:.04em;margin-top:24px}
+  @media(max-width:850px){.specimen-card{grid-template-columns:1fr}.main-photo{height:min(76vw,590px)}.details{padding:32px clamp(24px,6vw,52px) 38px}}
+  @media(max-width:500px){.site-header{height:66px;padding:0 16px}.logo{width:39px;height:39px}.header-note{display:none}.gallery{padding:13px;gap:10px}.main-photo{height:78vw;min-height:280px}.thumb{width:66px;height:66px;flex-basis:66px}.fact{grid-template-columns:110px minmax(0,1fr);gap:10px}.page-title{margin-bottom:26px}}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">
+    <div class="logo" aria-label="University logo placeholder"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V9m0 6c-5 0-7-3-7-7 4 0 7 2 7 7Zm0-3c0-4 2-7 7-7 0 4-2 7-7 7Z"/><path d="M7 21h10"/></svg></div>
+    <div><span class="brand-name">BYU–Hawaii</span><span class="brand-caption">Herbarium collection</span></div>
+  </div>
+  <span class="header-note">Botanical specimens · Oʻahu, Hawaiʻi</span>
+</header>
+<main>
+  <section class="page-title"><p class="overline">A living record of island flora</p><h1>BYU-H Herbarium Hub</h1><div class="title-rule"></div></section>
+  <article class="specimen-card" aria-label="Butterfly pea flower specimen">
+    <section class="gallery" aria-label="Specimen photographs">
+      <div class="main-photo" id="main-photo" role="button" tabindex="0" aria-label="View specimen image">
+        <div class="photo-art" id="photo-art" aria-hidden="true">
+          <svg viewBox="0 0 440 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M221 492C226 406 223 326 214 249C205 172 197 114 173 54" stroke="#526F4E" stroke-width="7" stroke-linecap="round"/>
+            <path d="M216 287C176 224 132 193 77 177" stroke="#526F4E" stroke-width="5" stroke-linecap="round"/><path d="M219 339C270 267 316 237 366 221" stroke="#526F4E" stroke-width="5" stroke-linecap="round"/>
+            <path d="M215 398C172 350 124 331 77 330" stroke="#526F4E" stroke-width="5" stroke-linecap="round"/><path d="M213 243C257 194 296 176 340 174" stroke="#526F4E" stroke-width="5" stroke-linecap="round"/>
+            <path d="M78 177C109 142 161 151 190 205C149 226 102 215 78 177Z" fill="#75956B" stroke="#496D4D" stroke-width="3"/><path d="M83 179L177 203" stroke="#d9e2c9" stroke-width="2"/>
+            <path d="M365 221C343 174 296 167 251 201C276 242 327 250 365 221Z" fill="#819E70" stroke="#496D4D" stroke-width="3"/><path d="M358 222L263 204" stroke="#d9e2c9" stroke-width="2"/>
+            <path d="M78 330C102 287 152 284 194 325C166 367 117 376 78 330Z" fill="#76966c" stroke="#496D4D" stroke-width="3"/><path d="M84 331L184 327" stroke="#d9e2c9" stroke-width="2"/>
+            <path d="M340 174C321 135 278 128 241 158C261 197 306 205 340 174Z" fill="#8aa578" stroke="#496D4D" stroke-width="3"/><path d="M334 175L249 160" stroke="#d9e2c9" stroke-width="2"/>
+            <path d="M177 55C183 12 220 14 231 43C253 19 283 39 270 67C305 61 313 91 288 105C310 125 286 151 259 136C248 169 216 160 213 132C187 154 163 134 179 109C147 101 151 72 177 55Z" fill="#7861A0" stroke="#5D4B83" stroke-width="3"/>
+            <path d="M216 58C228 80 231 104 218 133" stroke="#c9b8df" stroke-width="4" stroke-linecap="round"/><path d="M196 77C211 86 220 102 218 119" stroke="#c9b8df" stroke-width="3" stroke-linecap="round"/>
+            <path d="M217 132C226 113 248 105 263 114C254 137 234 148 217 132Z" fill="#efd57e" stroke="#bd9e4d" stroke-width="2"/>
+            <path d="M161 510H279" stroke="#9CAB91" stroke-width="2" stroke-linecap="round"/><path d="M176 522H264" stroke="#c1cbb9" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="image-caption" id="image-caption">Illustrative specimen image</span>
+      </div>
+      <div class="thumb-row" id="thumb-row" aria-label="Choose a specimen photo">
+        <button class="thumb active" type="button" data-kind="illustration" aria-label="Illustrative specimen image"><span class="thumb-art"><svg viewBox="0 0 40 48" fill="none" aria-hidden="true"><path d="M20 45V12m0 18C12 20 8 14 5 8c9 0 15 5 15 16Zm0-6c3-10 9-14 16-15-1 8-6 14-16 17Z" stroke="#64815f" stroke-width="2" stroke-linecap="round"/><path d="M20 12c-5-8 2-13 6-8 7-3 10 4 4 8 4 7-3 10-7 5-6 4-10-2-3-5Z" fill="#8873ae" stroke="#68568b" stroke-width="1.5"/></svg></span></button>
+      </div>
+    </section>
+    <section class="details">
+      <p class="record-kicker">Herbarium specimen · BYU-H</p>
+      <h2>Clitoria ternatea</h2>
+      <p class="common-name">Butterfly pea flower</p>
+      <span class="family-pill">Fabaceae</span>
+      <div class="detail-divider"></div>
+      <dl class="facts">
+        <div class="fact"><dt>Collector</dt><dd>Bella Rae Hunter</dd></div>
+        <div class="fact"><dt>Date collected</dt><dd>27 May 2026</dd></div>
+        <div class="fact"><dt>Personal number</dt><dd>BRH-2</dd></div>
+        <div class="fact"><dt>Status</dt><dd>Collected</dd></div>
+        <div class="fact"><dt>Location</dt><dd>Hauʻula, Oʻahu<br>21.60842 N · −157.91246 W</dd></div>
+        <div class="fact long"><dt>Surrounding species / habitat</dt><dd>Growing up the back fence area. Some of the vine has died back already.</dd></div>
+        <div class="fact long"><dt>Information</dt><dd>—</dd></div>
+      </dl>
+      <div class="specimen-number"><span>Collection number</span><strong>BYUH_26_50</strong></div>
+    </section>
+  </article>
+  <p class="bottom-note">Specimen record · BYU-H Herbarium · Hawaiʻi</p>
+</main>
+<script>
+// Photo thumbnails can be wired to specimen images as they become available.
+const mainPhoto=document.querySelector('#main-photo');
+const photoArt=document.querySelector('#photo-art');
+const caption=document.querySelector('#image-caption');
+document.querySelectorAll('.thumb').forEach(button=>button.addEventListener('click',()=>{
+  document.querySelectorAll('.thumb').forEach(item=>item.classList.remove('active'));
+  button.classList.add('active');
+  const image=button.querySelector('img');
+  if(image){
+    photoArt.innerHTML='';
+    const large=document.createElement('img');large.src=image.src;large.alt=image.alt;photoArt.append(large);
+    caption.textContent=image.alt||'Specimen photograph';
+  }else{
+    photoArt.innerHTML=`<svg viewBox="0 0 440 540" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M221 492C226 406 223 326 214 249C205 172 197 114 173 54" stroke="#526F4E" stroke-width="7" stroke-linecap="round"/><path d="M216 287C176 224 132 193 77 177" stroke="#526F4E" stroke-width="5" stroke-linecap="round"/><path d="M219 339C270 267 316 237 366 221" stroke="#526F4E" stroke-width="5" stroke-linecap="round"/><path d="M78 177C109 142 161 151 190 205C149 226 102 215 78 177Z" fill="#75956B" stroke="#496D4D" stroke-width="3"/><path d="M365 221C343 174 296 167 251 201C276 242 327 250 365 221Z" fill="#819E70" stroke="#496D4D" stroke-width="3"/><path d="M177 55C183 12 220 14 231 43C253 19 283 39 270 67C305 61 313 91 288 105C310 125 286 151 259 136C248 169 216 160 213 132C187 154 163 134 179 109C147 101 151 72 177 55Z" fill="#7861A0" stroke="#5D4B83" stroke-width="3"/><path d="M217 132C226 113 248 105 263 114C254 137 234 148 217 132Z" fill="#efd57e" stroke="#bd9e4d" stroke-width="2"/></svg>`;
+    caption.textContent='Illustrative specimen image';
+  }
+}));
+mainPhoto.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();}});
+</script>
+</body>
+</html>
