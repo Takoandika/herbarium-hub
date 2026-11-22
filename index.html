@@ -1,0 +1,234 @@
+I added the photo uploader to [index.html](/Users/bellahunter/Documents/Codex/2026-11-21/i-x20/index.html). The Apple format you were thinking of is usually **HEIC** (or HEIF); the picker accepts those, along with PNG, JPEG, and AVIF. It supports multiple selections, drag and drop, previews, and removing selected photos.
+
+Here’s the complete page to copy and paste. Photo previews depend on browser support; if a HEIC image can’t be previewed, the file is still selected and its name appears.
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BYU-H Herbarium Specimen Collection Log</title>
+<style>
+  :root{--ink:#173b36;--muted:#71817a;--line:#dce5dc;--paper:#fbfaf5;--white:#fffefa;--green:#315f4d;--deep:#183f39;--sage:#eaf0e6;--gold:#d1a45c;--shadow:0 16px 42px #23493a12}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  .page{max-width:1240px;margin:auto;padding:34px clamp(18px,4vw,54px) 56px}
+  header{display:flex;align-items:center;gap:20px;padding:8px 0 28px;border-bottom:1px solid var(--line);margin-bottom:30px}
+  .logo{width:76px;height:76px;flex:0 0 76px;border:1px dashed #91a99a;border-radius:18px;background:#f0f4ec;display:grid;place-items:center;text-align:center;color:#567363;font-size:10px;line-height:1.2;letter-spacing:.08em;text-transform:uppercase}
+  .logo svg{width:27px;height:27px;margin-bottom:3px;stroke:#688573}
+  .eyebrow{margin:0 0 4px;color:#778b7d;font-size:11px;font-weight:700;letter-spacing:.17em;text-transform:uppercase}
+  h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(25px,4vw,39px);line-height:1.15;font-weight:500;letter-spacing:-.025em;color:#173c36}
+  .intro{margin:9px 0 0;color:var(--muted);font-size:14px}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:24px;align-items:start}
+  .form-card,.side-card{background:var(--white);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+  .form-card{padding:clamp(20px,3vw,34px)} .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:25px}
+  h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:25px;font-weight:500;color:var(--deep)} .section-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+  .required-note{white-space:nowrap;color:#87928c;font-size:12px;padding-top:6px}
+  .fields{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:19px 16px}
+  .field{grid-column:span 4;min-width:0}.field.wide{grid-column:span 6}.field.full{grid-column:1/-1}.field.third{grid-column:span 3}
+  label{display:flex;gap:5px;align-items:baseline;margin:0 0 7px;font-size:12px;font-weight:700;color:#35564a;letter-spacing:.015em}
+  .req{color:#b6794e}.control{width:100%;min-height:45px;border:1px solid #d6e0d7;border-radius:9px;background:#fff;padding:11px 12px;color:var(--ink);font:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+  textarea.control{min-height:100px;resize:vertical}.control::placeholder{color:#a0aaa3;font-style:italic}.control:focus{border-color:#648a70;box-shadow:0 0 0 3px #648a701c}
+  select.control{appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235c7666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;color:#9aa69d}
+  select.control:valid{color:var(--ink)} .hint{margin:6px 0 0;color:#8b9890;font-size:11px}
+  .upload-box{border:1px dashed #a8b9aa;border-radius:12px;background:#f8faf5;padding:16px;transition:border-color .15s,background .15s}
+  .upload-box.dragover{border-color:#527a5d;background:#eff5ec}
+  .upload-top{display:flex;align-items:center;gap:12px}
+  .upload-icon{width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:#eaf0e6;display:grid;place-items:center;color:#52745d;font-size:20px}
+  .upload-copy{flex:1;color:#5f7468;font-size:13px}
+  .upload-copy strong{display:block;color:#315647;font-size:13px}
+  .upload-button{border:1px solid #cad8cc;background:#fffefa;border-radius:8px;padding:8px 12px;color:#365b49;font-size:12px;font-weight:700;cursor:pointer}
+  .upload-button:hover{background:#f0f5ef}
+  .file-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}
+  .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin-top:14px}
+  .photo-tile{position:relative;min-width:0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:white}
+  .photo-tile img{display:block;width:100%;height:95px;object-fit:cover;background:#eef1ec}
+  .photo-tile .filename{padding:6px 8px;color:#63776a;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .photo-tile .remove-photo{position:absolute;right:5px;top:5px;width:24px;height:24px;border:0;border-radius:50%;background:#173b36dd;color:white;font-size:16px;line-height:1;cursor:pointer}
+  .photo-tile .unsupported{height:95px;display:grid;place-items:center;text-align:center;padding:8px;color:#6d7e72;font-size:11px;background:#eef1ec}
+  .photo-count{margin:9px 0 0;color:#829087;font-size:11px}
+  .actions{display:flex;align-items:center;gap:11px;border-top:1px solid var(--line);padding-top:22px;margin-top:25px}
+  button{font:inherit;cursor:pointer}.primary{border:0;border-radius:9px;background:var(--green);color:white;padding:12px 19px;font-weight:700;box-shadow:0 5px 12px #315f4d24}.primary:hover{background:#244e3e}.secondary{border:1px solid var(--line);background:transparent;color:#52675d;border-radius:9px;padding:11px 16px}.secondary:hover{background:#f3f6f0}.saved{margin-left:auto;color:#61776a;font-size:12px;min-height:20px}
+  .side-card{padding:22px;position:sticky;top:20px}.side-kicker{margin:0 0 8px;color:#7d9182;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}.side-card h3{font:500 21px/1.2 Georgia,serif;margin:0 0 10px}.side-card p{margin:0;color:var(--muted);font-size:13px}.status-list{list-style:none;padding:0;margin:17px 0 0}.status-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #edf0eb;color:#52685b;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#9cb49e}
+  .preview{margin-top:28px;display:none}.preview.visible{display:block}.preview h2{font-size:22px;margin-bottom:12px}.entry{display:flex;flex-wrap:wrap;gap:8px 20px;border:1px solid var(--line);border-radius:12px;background:#fffefa;padding:16px 18px;color:#566c60;font-size:13px}.entry strong{color:var(--deep)}
+  footer{padding-top:22px;color:#8b9890;text-align:center;font-size:11px}
+  @media(max-width:900px){.layout{grid-template-columns:1fr}.side-card{position:static}.field{grid-column:span 6}.field.third{grid-column:span 6}}
+  @media(max-width:560px){.page{padding-top:20px}.logo{width:62px;height:62px;flex-basis:62px;border-radius:14px}.fields{gap:16px}.field,.field.wide,.field.third{grid-column:1/-1}.section-head{display:block}.required-note{display:block;padding-top:10px}.actions{flex-wrap:wrap}.saved{flex-basis:100%;margin:0}}
+</style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div class="logo" aria-label="University logo placeholder">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V9m0 6c-5 0-7-3-7-7 4 0 7 2 7 7Zm0-3c0-4 2-7 7-7 0 4-2 7-7 7Z"/><path d="M7 21h10"/></svg><br>University<br>Logo</div>
+    </div>
+    <div><p class="eyebrow">Herbarium · Field collection</p><h1>BYU-H Herbarium Specimen Collection Log</h1><p class="intro">Record the details of each plant collected in the field.</p></div>
+  </header>
+  <div class="layout">
+    <section class="form-card" aria-labelledby="entry-title">
+      <div class="section-head"><div><h2 id="entry-title">New specimen record</h2><p>Enter the collection details below.</p></div><span class="required-note"><span class="req">*</span> Required field</span></div>
+      <form id="specimen-form">
+        <div class="fields">
+          <div class="field"><label for="common">Common Name <span class="req">*</span></label><input class="control" id="common" name="common" placeholder="e.g. Butterfly pea flower" required></div>
+          <div class="field wide"><label for="scientific">Scientific Name <span class="req">*</span></label><input class="control" id="scientific" name="scientific" placeholder="e.g. Clitoria ternatea" required></div>
+          <div class="field"><label for="family">Family</label><input class="control" id="family" name="family" placeholder="e.g. Fabaceae"></div>
+          <div class="field wide"><label for="collector">Collector</label><input class="control" id="collector" name="collector" placeholder="e.g. Bella Rae Hunter"></div>
+          <div class="field third"><label for="date">Date</label><input class="control" id="date" name="date" type="date" aria-label="Collection date"></div>
+          <div class="field wide"><label for="personal">Collector's Personal Number</label><input class="control" id="personal" name="personal" placeholder="e.g. BRH-2"></div>
+          <div class="field third"><label for="status">Status <span class="req">*</span></label><select class="control" id="status" name="status" required><option value="" disabled selected>Select status</option><option>Collected</option><option>Freezing</option><option>Drying</option><option>Mounting</option><option>Mounted</option><option>Labeled</option><option>Complete</option><option>Discarded</option></select></div>
+          <div class="field third"><label for="collection">Collection Number</label><input class="control" id="collection" name="collection" placeholder="e.g. BYUH_26_50"></div>
+          <div class="field wide"><label for="location">Location</label><input class="control" id="location" name="location" placeholder="e.g. Hauʻula, 21.60842 N -157.91246 W"></div>
+          <div class="field full"><label for="habitat">Surrounding Species / Habitat</label><textarea class="control" id="habitat" name="habitat" placeholder="e.g. Growing up the back fence area. Some of the vine has died back already."></textarea></div>
+          <div class="field full"><label for="information">Information</label><textarea class="control" id="information" name="information" placeholder="e.g. Additional observations, identification notes, or collection details"></textarea></div>
+          <div class="field full">
+            <label for="photos">Specimen Photos</label>
+            <input class="file-input" id="photos" name="photos" type="file" accept="image/png,image/jpeg,image/avif,image/heic,image/heif,.png,.jpg,.jpeg,.avif,.heic,.heif" multiple>
+            <div class="upload-box" id="upload-box">
+              <div class="upload-top">
+                <span class="upload-icon" aria-hidden="true">＋</span>
+                <div class="upload-copy"><strong>Add specimen photos</strong>Choose or drop multiple images here</div>
+                <button class="upload-button" type="button" id="choose-photos">Choose photos</button>
+              </div>
+              <div class="photo-grid" id="photo-grid"></div>
+              <p class="photo-count" id="photo-count">PNG, JPEG, AVIF, HEIC, and HEIF · Multiple photos allowed</p>
+            </div>
+            <p class="hint">Add pressed specimen photos, field photos, or both. Photo previews are temporary and are not saved to a database.</p>
+          </div>
+        </div>
+        <div class="actions"><button class="primary" type="submit">Add specimen</button><button class="secondary" type="reset">Clear form</button><span class="saved" id="message" role="status" aria-live="polite"></span></div>
+      </form>
+      <section class="preview" id="preview" aria-live="polite"><h2>Recently added</h2><div id="entries"></div></section>
+    </section>
+    <aside class="side-card">
+      <p class="side-kicker">Collection workflow</p>
+      <h3>Specimen status</h3>
+      <p>Choose the stage that best describes where this specimen is in your collection process.</p>
+      <ul class="status-list">
+        <li><span class="dot"></span>Collected</li>
+        <li><span class="dot"></span>Freezing · Drying · Mounting</li>
+        <li><span class="dot"></span>Mounted · Labeled</li>
+        <li><span class="dot"></span>Complete · Discarded</li>
+      </ul>
+    </aside>
+  </div>
+  <footer>BYU-H Herbarium · Specimen collection log</footer>
+</main>
+<script>
+const form=document.querySelector('#specimen-form');
+const message=document.querySelector('#message');
+const preview=document.querySelector('#preview');
+const entries=document.querySelector('#entries');
+const photoInput=document.querySelector('#photos');
+const photoGrid=document.querySelector('#photo-grid');
+const photoCount=document.querySelector('#photo-count');
+const uploadBox=document.querySelector('#upload-box');
+let selectedPhotos=[];
+
+function renderPhotos(){
+  photoGrid.replaceChildren();
+  selectedPhotos.forEach((file,index)=>{
+    const tile=document.createElement('div');
+    tile.className='photo-tile';
+    const image=document.createElement('img');
+    image.alt=file.name;
+    const url=URL.createObjectURL(file);
+    image.src=url;
+    image.addEventListener('error',()=>{
+      image.remove();
+      const unsupported=document.createElement('div');
+      unsupported.className='unsupported';
+      unsupported.textContent='Preview unavailable';
+      tile.prepend(unsupported);
+      URL.revokeObjectURL(url);
+    },{once:true});
+    const filename=document.createElement('div');
+    filename.className='filename';
+    filename.textContent=file.name;
+    const remove=document.createElement('button');
+    remove.type='button';
+    remove.className='remove-photo';
+    remove.setAttribute('aria-label','Remove '+file.name);
+    remove.textContent='×';
+    remove.addEventListener('click',()=>{
+      selectedPhotos.splice(index,1);
+      renderPhotos();
+    });
+    tile.append(image,filename,remove);
+    photoGrid.append(tile);
+  });
+  photoCount.textContent=selectedPhotos.length
+    ? `${selectedPhotos.length} photo${selectedPhotos.length===1?'':'s'} selected`
+    : 'PNG, JPEG, AVIF, HEIC, and HEIF · Multiple photos allowed';
+}
+
+document.querySelector('#choose-photos').addEventListener('click',()=>photoInput.click());
+photoInput.addEventListener('change',()=>{
+  selectedPhotos.push(...Array.from(photoInput.files));
+  photoInput.value='';
+  renderPhotos();
+});
+uploadBox.addEventListener('dragover',event=>{
+  event.preventDefault();
+  uploadBox.classList.add('dragover');
+});
+uploadBox.addEventListener('dragleave',()=>uploadBox.classList.remove('dragover'));
+uploadBox.addEventListener('drop',event=>{
+  event.preventDefault();
+  uploadBox.classList.remove('dragover');
+  selectedPhotos.push(...Array.from(event.dataTransfer.files).filter(file=>
+    file.type.startsWith('image/') || /\.(png|jpe?g|avif|heic|heif)$/i.test(file.name)
+  ));
+  renderPhotos();
+});
+
+form.addEventListener('submit',event=>{
+  event.preventDefault();
+  if(!form.reportValidity()) return;
+  const data=new FormData(form);
+  const card=document.createElement('article');
+  card.className='entry';
+  const parts=[
+    ['Common name',data.get('common')],
+    ['Scientific name',data.get('scientific')],
+    ['Family',data.get('family')],
+    ['Collector',data.get('collector')],
+    ['Date',data.get('date')],
+    ['Personal no.',data.get('personal')],
+    ['Status',data.get('status')],
+    ['Collection no.',data.get('collection')],
+    ['Location',data.get('location')],
+    ['Habitat',data.get('habitat')],
+    ['Information',data.get('information')]
+  ];
+  for(const [label,value] of parts){
+    if(!value) continue;
+    const span=document.createElement('span');
+    const strong=document.createElement('strong');
+    strong.textContent=label+': ';
+    span.append(strong,document.createTextNode(value));
+    card.append(span);
+  }
+  if(selectedPhotos.length){
+    const photoInfo=document.createElement('span');
+    const strong=document.createElement('strong');
+    strong.textContent='Photos: ';
+    photoInfo.append(strong,document.createTextNode(selectedPhotos.map(file=>file.name).join(', ')));
+    card.append(photoInfo);
+  }
+  entries.prepend(card);
+  preview.classList.add('visible');
+  message.textContent='Specimen added to this page.';
+  form.reset();
+  selectedPhotos=[];
+  renderPhotos();
+});
+
+form.addEventListener('reset',()=>{
+  message.textContent='';
+  selectedPhotos=[];
+  renderPhotos();
+});
+</script>
+</body>
+</html>
+```
